@@ -38,6 +38,7 @@ var TeamcityReporter = function(baseReporterDecorator) {
   this.TEST_END      = '##teamcity[testFinished name=\'%s\' duration=\'%s\']';
   this.BLOCK_OPENED  = '##teamcity[blockOpened name=\'%s\']';
   this.BLOCK_CLOSED  = '##teamcity[blockClosed name=\'%s\']';
+  this.BUILD_PROBLEM = '##teamcity[buildProblem description=\'%s\']';
 
   var reporter = this;
   var initializeBrowser = function(browser) {
@@ -56,6 +57,12 @@ var TeamcityReporter = function(baseReporterDecorator) {
 
   this.onBrowserStart = function(browser){
     initializeBrowser(browser);
+  };
+
+  this.onBrowserError = function(browser, error) {
+    if (Object.keys(this.browserResults).length === 0) {
+      this.writeCommonMsg(formatMessage(this.BUILD_PROBLEM, browser+': '+error));
+    }
   };
 
   this.specSuccess = function(browser, result) {
